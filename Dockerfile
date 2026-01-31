@@ -1,7 +1,8 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.5-apache
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN apk add --no-cache sqlite
+RUN docker-php-ext-install pdo pdo_sqlite \
+    && a2enmod rewrite
 
-WORKDIR /app
+WORKDIR /var/www/html
