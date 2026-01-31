@@ -1,8 +1,8 @@
-FROM php:8.5-apache-alpine
+FROM dunglas/frankenphp:php8.5-alpine
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN docker-php-ext-install pdo pdo_sqlite \
- && a2enmod rewrite
+RUN apk add --no-cache sqlite \
+ && docker-php-ext-install pdo pdo_sqlite
 
-WORKDIR /var/www/html
+WORKDIR /app
