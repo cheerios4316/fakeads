@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+    fakeads:
+        build: .
+        volumes:
+            - ./:/app
+        command: php -S 0.0.0.0:8000 -t public
+        ports:
+            - "9000:8000"

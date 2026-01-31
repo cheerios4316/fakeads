@@ -1,0 +1,90 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "beberlei/doctrineextensions": "^1.5",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
+        "symfony/console": "7.4.*",
+        "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2",
+        "symfony/framework-bundle": "7.4.*",
+        "symfony/mime": "7.4.*",
+        "symfony/property-access": "7.4.*",
+        "symfony/property-info": "7.4.*",
+        "symfony/runtime": "7.4.*",
+        "symfony/serializer": "7.4.*",
+        "symfony/uid": "7.4.*",
+        "symfony/validator": "7.4.*",
+        "symfony/yaml": "7.4.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "make-migrations": "php bin/console doctrine:migrations:diff",
+        "migrate": "php bin/console doctrine:migrations:migrate --no-interaction",
+        "db:reset": [
+            "rm -f db/app.db",
+            "php bin/console doctrine:migrations:migrate --no-interaction"
+        ],
+        "analyse": "vendor/bin/phpstan analyse",
+        "cs-fixer": "vendor/bin/php-cs-fixer fix"
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.4.*"
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.93",
+        "phpstan/phpstan": "^2.1",
+        "symfony/maker-bundle": "^1.65"
+    }
+}
