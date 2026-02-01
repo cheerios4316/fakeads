@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Exception\FileNotFoundException;
+use App\Exception\NoContentException;
 use App\Exception\UnauthorizedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +35,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $error instanceof ExtraAttributesException => $this->getErrorJson($error->getMessage(), 400),
             $error instanceof UnprocessableEntityHttpException => $this->getErrorJson('Unprocessable entity: '.$error->getMessage(), code: 400),
             $error instanceof UnauthorizedException => $this->getErrorJson($error->getMessage(), $error->getCode()),
+            $error instanceof NoContentException => new JsonResponse([], 204),
             default => $this->getErrorJson('Internal server error: '.$error->getMessage(), 500),
         };
     }
@@ -43,5 +45,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         $event->setResponse(
             $this->getErrorResponse($event->getThrowable()),
         );
+
+        $event->allowCustomResponseCode();
     }
 }

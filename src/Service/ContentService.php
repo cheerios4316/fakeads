@@ -6,9 +6,14 @@ use App\Constants\Defaults;
 use App\Dto\FiltersDto;
 use App\Entity\Content;
 use App\Enums\SizeEnum;
+use App\Exception\FileNotFoundException;
 use App\Repository\ContentRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Uid\Uuid;
 
 class ContentService
 {
@@ -16,33 +21,35 @@ class ContentService
         private readonly ContentRepository $repository,
         private readonly UploadService $uploadService,
         private readonly RequestStack $requestStack,
+        private readonly KernelInterface $kernel,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     /**
      * @return array<Content>
      */
-    public function getRandom(?FiltersDto $filters = null): array
+    public function getRandomList(?FiltersDto $filters = null): array
     {
         $limit = $filters->limit ?? Defaults::LIMIT;
-        $query = $this->repository->repo()->createQueryBuilder('e');
+        $size = $filters?->size ? SizeEnum::from($filters?->size) : null;
 
-        $query
-            ->orderBy('RANDOM()')
-            ->setMaxResults($limit)
-        ;
+        return $this->repository->listRandom($limit, $size);
+    }
 
-        if (!is_null($filters?->size)) {
-            $query
-                ->andWhere('e.size = :size')
-                ->setParameter('size', SizeEnum::from($filters->size))
-            ;
-        }
+    public function getRandomElement(): ?Content
+    {
+        return $this->repository->getRandomElement();
+    }
 
-        /** @var array<Content> $result */
-        $result = $query->getQuery()->getResult();
+    public function getRandomBanner(): ?Content
+    {
+        return $this->repository->getRandomElement(SizeEnum::BANNER);
+    }
 
-        return $result;
+    public function getRandomPopup(): ?Content
+    {
+        return $this->repository->getRandomElement(SizeEnum::POPUP);
     }
 
     public function upload(
@@ -58,7 +65,7 @@ class ContentService
 
         $entity = new Content(
             id: $uuid,
-            url: $baseUrl.'/file/'.$uuid,
+            url: $baseUrl . '/file/' . $uuid,
             fileName: $saved->name,
             clickout: $clickout,
             size: $size,
@@ -68,5 +75,26 @@ class ContentService
         $this->repository->save($entity);
 
         return $entity;
+    }
+
+    public function getFilePathByUuid(string $uuid): ?string
+    {
+        $repository = $this->entityManager->getRepository(Content::class);
+        $file = $repository->find(Uuid::fromString($uuid));
+
+        if (!$file) {
+            throw new FileNotFoundException($uuid);
+        }
+
+        return $this->getFilePathByEntity($file);
+    }
+
+    public function getFilePathByEntity(Content $file): string
+    {
+        return implode(DIRECTORY_SEPARATOR, [
+            rtrim($this->kernel->getProjectDir(), DIRECTORY_SEPARATOR),
+            'public/uploads',
+            $file->getFileName(),
+        ]);
     }
 }

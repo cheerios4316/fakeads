@@ -1,0 +1,8 @@
+nelmio_api_doc:
+  areas:
+    default:
+      path_patterns:
+        - ^/(?!_error|_wdt|_profiler).+
+  html_config:
+    swagger_ui_config:
+      enabled: true

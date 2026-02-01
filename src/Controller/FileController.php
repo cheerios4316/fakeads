@@ -2,38 +2,36 @@
 
 namespace App\Controller;
 
-use App\Entity\Content;
-use App\Exception\FileNotFoundException;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\ContentService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Uid\Uuid;
+use OpenApi\Attributes as OA;
 
 final class FileController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private KernelInterface $kernel,
+        private ContentService $contentService,
     ) {
     }
 
+    #[OA\Get(
+        path: '/file/{uuid}',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Responds with file of given uuid',
+                content: new OA\MediaType(
+                    mediaType: 'image/*',
+                    schema: new OA\Schema(type: 'string', format: 'binary')
+                )
+            )
+        ]
+    )]
     #[Route(path: '/file/{uuid}', methods: ['GET'])]
     public function file(
         string $uuid,
     ): BinaryFileResponse {
-        $repository = $this->entityManager->getRepository(Content::class);
-        $file = $repository->find(Uuid::fromString($uuid));
-
-        if (!$file) {
-            throw new FileNotFoundException($uuid);
-        }
-
-        $path = implode(DIRECTORY_SEPARATOR, [
-            rtrim($this->kernel->getProjectDir(), DIRECTORY_SEPARATOR),
-            'public/uploads',
-            $file->getFileName(),
-        ]);
+        $path = $this->contentService->getFilePathByUuid($uuid);
 
         return new BinaryFileResponse(
             $path,
