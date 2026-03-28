@@ -1,2 +1,3 @@
 repo_url: git@github.com:cheerios4316/fakeads.git
+should_build: true
 container_name: fakeads
