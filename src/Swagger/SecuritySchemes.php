@@ -10,4 +10,6 @@ use OpenApi\Attributes as OA;
     scheme: 'bearer',
     bearerFormat: 'JWT'
 )]
-final class SecuritySchemes {}
+final class SecuritySchemes
+{
+}

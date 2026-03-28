@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-use App\Enums\SizeEnum;
+use App\Enums\CategoryEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class UploadDto
@@ -10,10 +10,10 @@ final class UploadDto
     public ?string $clickout = null;
 
     #[Assert\Choice(
-        choices: ['banner', 'popup'],
+        choices: ['banner', 'popup', 'gemjak'],
         message: 'size must be one of {{ choices }}',
     )]
-    public string $size = SizeEnum::BANNER->value;
+    public string $category = CategoryEnum::BANNER->value;
 
     public ?string $description = null;
 }

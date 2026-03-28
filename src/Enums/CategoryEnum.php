@@ -2,8 +2,9 @@
 
 namespace App\Enums;
 
-enum SizeEnum: string
+enum CategoryEnum: string
 {
     case BANNER = 'banner';
     case POPUP = 'popup';
+    case GEMJAK = 'gemjak';
 }

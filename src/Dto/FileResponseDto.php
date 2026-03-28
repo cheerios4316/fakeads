@@ -2,12 +2,12 @@
 
 namespace App\Dto;
 
-use App\Enums\SizeEnum;
+use App\Enums\CategoryEnum;
 
 class FileResponseDto
 {
     public string $url;
     public ?string $clickout;
     public ?string $description;
-    public SizeEnum $size;
+    public CategoryEnum $size;
 }

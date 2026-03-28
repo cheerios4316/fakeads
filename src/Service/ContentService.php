@@ -5,10 +5,9 @@ namespace App\Service;
 use App\Constants\Defaults;
 use App\Dto\FiltersDto;
 use App\Entity\Content;
-use App\Enums\SizeEnum;
+use App\Enums\CategoryEnum;
 use App\Exception\FileNotFoundException;
 use App\Repository\ContentRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,9 +31,14 @@ class ContentService
     public function getRandomList(?FiltersDto $filters = null): array
     {
         $limit = $filters->limit ?? Defaults::LIMIT;
-        $size = $filters?->size ? SizeEnum::from($filters?->size) : null;
+        $size = $filters?->size ? CategoryEnum::from($filters?->size) : null;
 
         return $this->repository->listRandom($limit, $size);
+    }
+
+    public function getAllGemJaks(int $limit = 10): array
+    {
+        return $this->repository->list($limit, CategoryEnum::GEMJAK);
     }
 
     public function getRandomElement(): ?Content
@@ -44,18 +48,18 @@ class ContentService
 
     public function getRandomBanner(): ?Content
     {
-        return $this->repository->getRandomElement(SizeEnum::BANNER);
+        return $this->repository->getRandomElement(CategoryEnum::BANNER);
     }
 
     public function getRandomPopup(): ?Content
     {
-        return $this->repository->getRandomElement(SizeEnum::POPUP);
+        return $this->repository->getRandomElement(CategoryEnum::POPUP);
     }
 
     public function upload(
         UploadedFile $file,
         ?string $clickout = null,
-        SizeEnum $size = SizeEnum::BANNER,
+        CategoryEnum $category = CategoryEnum::BANNER,
         ?string $description = null,
     ): Content {
         $saved = $this->uploadService->saveToFilesystem($file);
@@ -65,11 +69,11 @@ class ContentService
 
         $entity = new Content(
             id: $uuid,
-            url: $baseUrl . '/file/' . $uuid,
+            url: $baseUrl.'/file/'.$uuid,
             fileName: $saved->name,
+            description: $description,
             clickout: $clickout,
-            size: $size,
-            description: $description
+            size: $category
         );
 
         $this->repository->save($entity);

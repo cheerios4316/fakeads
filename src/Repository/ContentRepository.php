@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Content;
-use App\Enums\SizeEnum;
+use App\Enums\CategoryEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
@@ -28,7 +28,19 @@ class ContentRepository
         return $this->entityManager->getRepository(Content::class);
     }
 
-    public function listRandom(int $limit, ?SizeEnum $size): array
+    public function list(int $limit, CategoryEnum $category): array
+    {
+        $query = $this->repo()->createQueryBuilder('e');
+
+        $query
+            ->andWhere('e.size = :size')
+            ->setParameter('size', $category)
+        ;
+
+        return $query->getQuery()->getResult();
+    }
+
+    public function listRandom(int $limit, ?CategoryEnum $size): array
     {
         $query = $this->repo()->createQueryBuilder('e');
 
@@ -36,7 +48,7 @@ class ContentRepository
             ->orderBy('RANDOM()')
             ->setMaxResults($limit);
 
-        if ($size !== null) {
+        if (null !== $size) {
             $query
                 ->andWhere('e.size = :size')
                 ->setParameter('size', $size);
@@ -48,7 +60,7 @@ class ContentRepository
         return $result;
     }
 
-    public function getRandomElement(?SizeEnum $size = null): ?Content
+    public function getRandomElement(?CategoryEnum $size = null): ?Content
     {
         return $this->listRandom(1, $size)[0] ?? null;
     }

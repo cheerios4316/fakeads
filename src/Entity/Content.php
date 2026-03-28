@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Enums\SizeEnum;
+use App\Enums\CategoryEnum;
 use Doctrine\ORM\Mapping;
 use Symfony\Component\Uid\Uuid;
 
@@ -21,13 +21,13 @@ final class Content implements \JsonSerializable
         private ?string $description = null,
         #[Mapping\Column(type: 'string', length: 255, nullable: true)]
         private ?string $clickout = null,
-        #[Mapping\Column(type: 'string', length: 10, enumType: SizeEnum::class)]
-        private SizeEnum $size = SizeEnum::BANNER,
+        #[Mapping\Column(type: 'string', length: 10, enumType: CategoryEnum::class)]
+        private CategoryEnum $size = CategoryEnum::BANNER,
     ) {
     }
 
     /**
-     * @return array{clickout: string|null, size: SizeEnum, url: string}
+     * @return array{clickout: string|null, size: CategoryEnum, url: string}
      */
     public function jsonSerialize(): array
     {
